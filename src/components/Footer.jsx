@@ -6,7 +6,7 @@ export default function Footer() {
     if (!termName) return;
     const password = prompt("Yönetici yetkilendirme şifresi:");
     
-    if (password === "admin123") {
+    if (password === "öğretmen5252") {
       alert(`İşlem Başarılı: ${termName} veritabanından ${type === 'add' ? 'eklendi' : 'silindi'}.`);
     } else {
       alert("Hata: Yetkisiz erişim denemesi!");
