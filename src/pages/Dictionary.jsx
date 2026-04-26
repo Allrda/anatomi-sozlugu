@@ -1,24 +1,32 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { fetchAnatomyTerms } from '../utils/api'; // Gereksiz importlar temizlendi
+import { fetchAnatomyTerms, addTerm, removeTerm } from '../utils/api'; // Fonksiyonları import ettik
 
 export default function Dictionary() {
   const [terms, setTerms] = useState([]);
   const [activeLetter, setActiveLetter] = useState('A');
   
   useEffect(() => {
-    // Verileri doğrudan Firebase'den yüklüyoruz
     const loadTerms = async () => {
       const data = await fetchAnatomyTerms();
       setTerms(data);
     };
-    
     loadTerms();
   }, []);
 
+  // Kelime Ekleme (Örnek kullanım)
+  const handleAddTerm = async (name) => {
+    const updatedTerms = await addTerm(name);
+    setTerms(updatedTerms);
+  };
+
+  // Kelime Silme (Örnek kullanım)
+  const handleRemoveTerm = async (name) => {
+    const updatedTerms = await removeTerm(name);
+    setTerms(updatedTerms);
+  };
+
   const ALPHABET = "ABCÇDEFGĞHIİJKLMNOÖPRSŞTUÜVYZ".split("");
-  
-  // Terimleri harfe göre filtrele
   const filtered = terms.filter(t => (t.harf || (t.isim && t.isim.charAt(0).toLocaleUpperCase('tr-TR'))) === activeLetter);
 
   return (
@@ -42,13 +50,13 @@ export default function Dictionary() {
           {/* KELİME KARTLARI */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '15px' }}>
             {filtered.map((t, i) => (
-              <Link 
-                key={i} 
-                to={`/terim/${t.isim}`} 
-                className="term-link"
-              >
-                {t.isim}
-              </Link>
+              <div key={i} style={{ position: 'relative' }}>
+                <Link to={`/terim/${t.isim}`} className="term-link">
+                  {t.isim}
+                </Link>
+                {/* Silme butonu örneği: Burayı admin paneline göre kendine göre şekillendirirsin */}
+                <button onClick={() => handleRemoveTerm(t.isim)} style={{ fontSize: '10px', color: 'red' }}>X</button>
+              </div>
             ))}
             {filtered.length === 0 && (
               <div style={{gridColumn: 'span 5', textAlign: 'center', color: '#6b7280', fontStyle: 'italic', padding: '20px'}}>

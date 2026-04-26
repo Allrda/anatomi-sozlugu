@@ -6,22 +6,25 @@ export const fetchAnatomyTerms = async () => {
   return terms || [];
 };
 
-// Yeni terim ekleme
+// Yeni terim ekleme - Güncel listeyi döndürür
 export const addTerm = async (name) => {
   const terms = await getGlobalTerms() || [];
   const harf = name.charAt(0).toLocaleUpperCase('tr-TR');
   
   if (!terms.find(t => t.isim === name)) {
-    terms.push({ isim: name, harf: harf });
-    await saveGlobalTerms(terms);
+    const updatedTerms = [...terms, { isim: name, harf: harf }];
+    await saveGlobalTerms(updatedTerms);
+    return updatedTerms; // İşlem sonrası güncel listeyi döndür
   }
+  return terms; // Değişiklik yoksa mevcut listeyi döndür
 };
 
-// Terim silme
+// Terim silme - Güncel listeyi döndürür
 export const removeTerm = async (name) => {
   const terms = await getGlobalTerms() || [];
   const filtered = terms.filter(t => t.isim !== name);
   await saveGlobalTerms(filtered);
+  return filtered; // İşlem sonrası güncel listeyi döndür
 };
 
 // Yerel veriyi Firebase'e taşıyan taşıyıcı fonksiyon
@@ -36,7 +39,7 @@ export const migrateLocalToFirebase = async () => {
       .map(name => merged.find(a => a.isim === name));
       
     await saveGlobalTerms(unique);
-    localStorage.removeItem('anatomi_terms'); // Temizlik yap
+    localStorage.removeItem('anatomi_terms'); 
     window.location.reload(); 
   }
 };
