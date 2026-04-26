@@ -1,31 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { fetchAnatomyTerms, removeTerm } from '../utils/api'; // removeTerm eklendi
+import { fetchAnatomyTerms, removeTerm } from '../utils/api';
+import { ADMIN_PASSWORD } from '../utils/config';
 
 export default function Dictionary() {
   const [terms, setTerms] = useState([]);
   const [activeLetter, setActiveLetter] = useState('A');
   
   useEffect(() => {
-    // Verileri doğrudan Firebase'den yüklüyoruz
     const loadTerms = async () => {
       const data = await fetchAnatomyTerms();
       setTerms(data);
     };
-    
     loadTerms();
   }, []);
 
-  // Terim Silme İşlemi (Şifre Kontrollü)
   const handleRemoveTerm = async (name) => {
-    // Şifre kontrolü - admin123'ü kendine göre değiştir
     const password = prompt(`'${name}' terimini silmek için yetkili şifresini girin:`);
     
-    if (password === "admin123") {
-      const updatedTerms = await removeTerm(name); // API'ye silme isteği gönder
-      setTerms(updatedTerms); // Arayüzü (state) sayfa yenilenmeden güncelle
+    if (password && password.trim() === ADMIN_PASSWORD) {
+      const updatedTerms = await removeTerm(name);
+      setTerms(updatedTerms);
       alert(`'${name}' başarıyla silindi.`);
-    } else if (password !== null) { // İptal edilmediyse
+    } else if (password !== null) {
       alert("Hatalı şifre! Silme işlemi iptal edildi.");
     }
   };

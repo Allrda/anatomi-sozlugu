@@ -1,14 +1,24 @@
 import React from 'react';
+import { ADMIN_PASSWORD } from '../utils/config'; // Merkezi şifreyi çekiyoruz
+import { addTerm, removeTerm } from '../utils/api'; // API fonksiyonlarını bağladık
 
 export default function Footer() {
-  const handleAction = (type) => {
+  const handleAction = async (type) => {
     const termName = prompt(`İşlem yapılacak terim adını giriniz (${type === 'add' ? 'Ekleme' : 'Silme'}):`);
-    if (!termName) return;
+    if (!termName) return; // İptal edilirse çık
+    
     const password = prompt("Yönetici yetkilendirme şifresi:");
     
-    if (password === "öğretmen5252") {
-      alert(`İşlem Başarılı: ${termName} veritabanından ${type === 'add' ? 'eklendi' : 'silindi'}.`);
-    } else {
+    // Şifreyi config dosyasından gelenle karşılaştır
+    if (password && password.trim() === ADMIN_PASSWORD) {
+      if (type === 'add') {
+        await addTerm(termName);
+        alert(`Başarılı: '${termName}' terimi eklendi. Sayfayı yenilemen gerekebilir.`);
+      } else {
+        await removeTerm(termName);
+        alert(`Başarılı: '${termName}' terimi silindi. Sayfayı yenilemen gerekebilir.`);
+      }
+    } else if (password !== null) {
       alert("Hata: Yetkisiz erişim denemesi!");
     }
   };
